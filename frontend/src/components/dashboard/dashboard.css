@@ -1,0 +1,311 @@
+/* dashboard.css - layout + styles */
+
+/* Root theme vars */
+:root {
+  --bg: #f6f6f6;
+  --panel: #ffffff;
+  --muted: #6b7280;
+  --accent: #00b894;
+  --danger: #ff4d4f;
+  --text: #111827;
+  --shadow: 0 8px 18px rgba(17,24,39,0.06);
+}
+
+/* Dark mode (toggle by adding .dark on html) */
+html.dark {
+  --bg: #0f1114;
+  --panel: #0b0d0f;
+  --muted: #9aa4b2;
+  --accent: #4fd1c5;
+  --danger: #ff6b6b;
+  --text: #e6eef3;
+  --shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+/* Layout */
+.ds-layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--bg), #fff);
+  color: var(--text);
+}
+
+/* Sidebar */
+.ds-sidebar {
+  width: 260px;
+  background: #07070a;
+  color: white;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+}
+html.light .ds-sidebar {
+  background: #0b0b0d;
+}
+.ds-sidebar-inner {
+  padding: 28px 18px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.ds-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ds-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(90deg,#2fb5ff,#ff8bd6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.ds-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.ds-nav-link {
+  display: inline-block;
+  padding: 10px 12px;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  background: transparent;
+}
+.ds-nav-link.active, .ds-nav-link:focus, .ds-nav-link:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+/* spacer pushes user area to bottom */
+.ds-spacer { flex: 1; }
+
+/* user area */
+.ds-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-direction: column;
+  text-align: center;
+}
+.user-avatar { width: 48px; height: 48px; border-radius: 999px; object-fit: cover; }
+.user-meta { font-size: 12px; line-height: 1.0; color: rgba(255,255,255,0.9); }
+.btn-logout, .btn-login {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+}
+
+/* Topbar + main */
+.ds-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.ds-topbar {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 28px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent);
+}
+html.dark .ds-topbar { border-bottom-color: rgba(255,255,255,0.04); background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
+
+.ds-topbar-left { display:flex; align-items:center; gap:14px; }
+.ds-hamburger { font-size: 22px; background: none; border: none; cursor: pointer; color: var(--text); }
+.ds-breadcrumb { font-weight: 700; font-size: 18px; color: var(--text); }
+
+.ds-topbar-right { display:flex; align-items:center; gap:12px; }
+.search-wrap { border: 1px solid rgba(0,0,0,0.06); border-radius: 999px; padding: 6px 10px; display:flex; align-items:center; }
+.search-input { border: none; background: transparent; outline: none; width: 240px; }
+.icon-btn { background: transparent; border: none; font-size: 18px; cursor: pointer; }
+.primary.small { background: black; color: white; padding: 8px 12px; border-radius: 999px; }
+
+/* Content area */
+.ds-content {
+  padding: 28px;
+  flex: 1;
+  min-height: calc(100vh - 68px);
+}
+
+/* Project form area (centered card) */
+.page-wrap { width: 100%; max-width: 1100px; margin: 0 auto; }
+.project-form-wrap { display:flex; justify-content:flex-start; align-items:flex-start; padding-top: 12px; }
+.project-form-card {
+  width: 720px;
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-sizing: border-box;
+}
+
+/* Rounded large card UI as screenshot */
+.form-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+.field-label { font-weight: 600; margin-top: 8px; margin-bottom: 6px; display:block; }
+.field-input {
+  width: 100%;
+  height: 40px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.12);
+  padding: 8px 14px;
+  box-sizing: border-box;
+}
+.field-textarea {
+  width: 100%;
+  min-height: 100px;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.radio-row { display:flex; gap:18px; align-items:center; margin-bottom: 8px; }
+.upload-btn {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: black;
+  color: white;
+  cursor: pointer;
+}
+.upload-btn input { display:none; }
+
+/* actions */
+.form-actions { display:flex; justify-content:flex-end; gap:12px; margin-top: 16px; }
+.btn { padding: 8px 18px; border-radius: 999px; border: none; cursor: pointer; }
+.btn.discard { background: var(--danger); color: white; }
+.btn.save { background: var(--accent); color: white; }
+
+/* Responsive rules */
+@media (max-width: 1000px) {
+  .ds-sidebar { width: 70px; }
+  .ds-brand-text { display: none; }
+  .ds-nav-link { padding: 10px; font-size: 13px; }
+  .project-form-card { width: 100%; padding: 16px; border-radius: 12px; }
+  .search-input { width: 120px; }
+}
+
+@media (max-width: 760px) {
+  .ds-layout { flex-direction: column; }
+  .ds-sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 40; width: 70px; }
+  .ds-main { margin-left: 70px; }
+  .ds-topbar { position: sticky; top: 0; z-index: 20; }
+  .ds-content { padding: 16px; }
+  .project-form-wrap { justify-content:center; padding-top: 18px; }
+}
+
+@media (max-width: 420px) {
+  .project-form-card { padding: 12px; }
+  .field-input, .field-textarea { border-radius: 10px; }
+  .search-input { display: none; }
+}
+/* put this at the end of your CSS file */
+.ds-sidebar {
+  width: 260px;              /* default width */
+  min-width: 260px;
+  max-width: 260px;
+  box-sizing: border-box;
+  transition: width 220ms ease;
+}
+
+/* collapsed: force icon-only width */
+.ds-sidebar.collapsed {
+  width: 64px !important;
+  min-width: 64px !important;
+  max-width: 64px !important;
+  overflow: hidden;
+}
+
+/* make sure inner container doesn't keep large padding/width */
+.ds-sidebar .ds-sidebar-inner {
+  width: 100%;
+  box-sizing: border-box;
+  transition: padding 220ms ease;
+}
+
+/* if there are inner elements with fixed widths, override them */
+.ds-sidebar .ds-brand,
+.ds-sidebar .ds-nav,
+.ds-sidebar .ds-user {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* hide textual parts when collapsed */
+.ds-sidebar.collapsed .ds-brand-text,
+.ds-sidebar.collapsed .ds-nav .ds-nav-link > .label,
+.ds-sidebar.collapsed .user-meta {
+  display: none !important;
+}
+
+/* Keep the logout/login button visible when collapsed, hide only its text */
+.ds-sidebar .btn-logout,
+.ds-sidebar .btn-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+}
+
+/* collapse: hide only the text inside the buttons */
+.ds-sidebar.collapsed .btn-logout .btn-text,
+.ds-sidebar.collapsed .btn-login .btn-text {
+  display: none !important;
+}
+
+/* reduce padding for compact look when collapsed */
+.ds-sidebar.collapsed .btn-logout,
+.ds-sidebar.collapsed .btn-login {
+  padding: 6px;
+  justify-content: center;
+}
+
+/* ensure user-actions are not hidden */
+.ds-sidebar .user-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  align-items: center;
+}
+.ds-sidebar.collapsed .user-actions {
+  justify-content: center;
+}
+
+/* center icons when collapsed */
+.ds-sidebar.collapsed .ds-nav .ds-nav-link {
+  justify-content: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
