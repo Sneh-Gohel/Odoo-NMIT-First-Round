@@ -1,14 +1,14 @@
 import { Router } from 'express';
+import { protect } from '../middlewares/auth.middleware';
+// Import BOTH controller functions from the controller file
+import { createProject, getProjects } from '../controllers/project.controller';
 
 const router = Router();
 
-// This will eventually be replaced by controller functions
-router.post('/', (req, res) => {
-  res.status(201).json({ message: 'Project created successfully', data: req.body });
-});
 
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'List of all projects' });
-});
+router.post('/', protect, createProject);
+
+
+router.get('/', protect, getProjects);
 
 export default router;

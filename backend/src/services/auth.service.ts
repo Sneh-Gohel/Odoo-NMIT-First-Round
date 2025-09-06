@@ -1,5 +1,4 @@
 import { db, admin, clientAuth } from '../config/firebase';
-import bcrypt from 'bcryptjs';
 import { sendOtpEmail } from './email.service';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import jwt from 'jsonwebtoken';
@@ -7,49 +6,47 @@ import jwt from 'jsonwebtoken';
 const PENDING_USERS_COLLECTION = 'pendingUsers';
 
 
-export const initiateSignup = async (name: string, email: string, password:string) => {
+export const initiateSignup = async (name: string, email: string, password: string) => {
   try {
     await admin.auth().getUserByEmail(email);
     throw new Error('An account with this email already exists.');
   } catch (error: any) {
-    if (error.code !== 'auth/user-not-found') {
-      throw error;
-    }
+    if (error.code !== 'auth/user-not-found') { throw error; }
   }
 
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash(password, salt);
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
+  // Store the plain-text password temporarily
   const pendingUserRef = db.collection(PENDING_USERS_COLLECTION).doc(email);
-  await pendingUserRef.set({ name, email, passwordHash, otp, expiresAt });
+  await pendingUserRef.set({
+    name,
+    email,
+    password, 
+    otp,
+    expiresAt,
+  });
+
   await sendOtpEmail(email, otp);
 };
 
-export const verifyAndCompleteSignup = async (email: string, otp: string) => {
 
+export const verifyAndCompleteSignup = async (email: string, otp: string) => {
   const pendingUserRef = db.collection(PENDING_USERS_COLLECTION).doc(email);
   const doc = await pendingUserRef.get();
 
-  if (!doc.exists) {
-    throw new Error('No pending registration found for this email.');
-  }
-
+  if (!doc.exists) { throw new Error('No pending registration found for this email.'); }
   const data = doc.data()!;
-
   if (data.expiresAt.toDate() < new Date()) {
     await pendingUserRef.delete();
     throw new Error('OTP has expired. Please try signing up again.');
   }
+  if (data.otp !== otp) { throw new Error('Invalid OTP.'); }
 
-  if (data.otp !== otp) {
-    throw new Error('Invalid OTP.');
-  }
-
+  // Create the user in Firebase Auth with the plain-text password
   const userRecord = await admin.auth().createUser({
     email: data.email,
-    password: data.passwordHash, 
+    password: data.password, // <-- CHANGE: Using the plain password from the document
     displayName: data.name,
   });
 
@@ -86,7 +83,7 @@ export const loginUser = async (email: string, password: string): Promise<string
     if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
       throw new Error('Invalid email or password.');
     }
-    
+
     throw new Error('Login failed. Please try again.');
   }
 };
