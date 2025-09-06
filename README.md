@@ -8,7 +8,7 @@
 **Submission:** Advanced Team Collaboration Platform – *SynergySphere*  
 
 ## GUI:- main branch
-## Branch--> BackEnd --> Backend
+## Backend :- BackEnd
 
 ---
 ## 🔗 Resources  
