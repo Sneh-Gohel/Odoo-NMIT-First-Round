@@ -4,13 +4,6 @@
     color: rgb(var(--text));
 }
 
-.logo__gradient {
-  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-}
 /* Basic theme variables for light/dark.
    We attach theme class to <html> (recommended for global theming).
    Adjust values to match your brand (#52a4b0 etc.). */
