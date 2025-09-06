@@ -4,21 +4,22 @@ import './Hero.css';
 import Ecllipse1 from '/Ellipse11.png';
 import Ecllipse2 from '/Ellipse12.png';
 import Ecllipse3 from '/Ellipse13.png';
-import  LeftLine from '/AboutLineLeft.png';
-import  RightLine from '/AboutLineRight.png';
+import LeftLine from '/AboutLineLeft.png';
+import RightLine from '/AboutLineRight.png';
 import Group1 from '/Group1.png';
 import Group2 from '/Group2.png';
 import Group3 from '/Group3.png';
 import Group4 from '/Group4.png';
+
 const Hero = () => {
   return (
     <>
       <section className="hero d-flex align-items-center position-relative mt-5">
         <div>
-          <img src={Group1} alt="group1" className="decorative-line position-absolute grp1" draggable="false" />
-          <img src={Group2} alt="group2" className="decorative-line position-absolute grp2" draggable="false"/>
-          <img src={Group3} alt="group3" className="decorative-line position-absolute grp3" draggable="false"/>
-          <img src={Group4} alt="group4" className="decorative-line position-absolute grp4" draggable="false"/>
+          <img src={Group1} alt="group1" className="decorative-line position-absolute grp1 floating-animation-1" draggable="false" />
+          <img src={Group2} alt="group2" className="decorative-line position-absolute grp2 floating-animation-2" draggable="false"/>
+          <img src={Group3} alt="group3" className="decorative-line position-absolute grp3 floating-animation-3" draggable="false"/>
+          <img src={Group4} alt="group4" className="decorative-line position-absolute grp4 floating-animation-4" draggable="false"/>
           <img src={LeftLine} alt="Left Decorative Line" className="decorative-line position-absolute leftL" draggable="false"/>
           <img src={RightLine} alt="Right Decorative Line" className="decorative-line position-absolute rightL" draggable="false"/>
         </div>
@@ -40,7 +41,7 @@ const Hero = () => {
 
       <section className="py-5" id="features">
         <div className="container text-center">
-          <h2 className="mb-5 fw-bold hero-tagline">Collaboration in <span className='logo__gradient'>Action</span></h2>
+          <h2 className="mb-5 fw-bold hero-tagline">Collaboration in <span className='logo__gradient head2'>Action</span></h2>
           <div className="row g-4 justify-content-center">
             <div className="col-md-6 col-lg-3">
               <div className="card h-100 border-0 shadow-feature bg-light">
@@ -75,7 +76,6 @@ const Hero = () => {
           </div>
         </div>
       </section>
-      
     </>
   );
 };
