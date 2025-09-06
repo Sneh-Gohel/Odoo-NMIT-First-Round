@@ -1,5 +1,4 @@
-// Replace/Add this inside your ProjectsPage.jsx (or replace the whole file)
-// Only changed part is AddMemberModal hook ordering; rest is the same integration.
+// ProjectsPage.jsx
 
 import React, { useEffect, useState } from "react";
 import ProjectsGrid from "../components/projects/ProjectsGrid";
@@ -8,13 +7,23 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://192.168.137.3:3333/v1/projects";
 
-/* --- helper fns (format, normalize...) kept as before --- */
-// ... (keep your existing helper functions: formatDateToDMY, calcDaysLeft, resolveImage, normalizeTags, normalizeMembers) ...
-// For brevity, assume they are present above exactly as in your working file.
+/* ------------------ Static Images ------------------ */
+const STATIC_IMAGES = [
+  "/images/projects/project1.jpg",
+  "/images/projects/project2.jpg",
+  "/images/projects/project3.jpg",
+];
+
+/* ------------------ helper functions ------------------ */
 function formatDateToDMY(dateInput) {
   if (!dateInput) return "";
-  const d = new Date(dateInput);
-  if (Number.isNaN(d.getTime())) return String(dateInput);
+  let d;
+  if (typeof dateInput === "object" && dateInput._seconds) {
+    d = new Date(dateInput._seconds * 1000);
+  } else {
+    d = new Date(dateInput);
+  }
+  if (Number.isNaN(d.getTime())) return "";
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();
@@ -24,7 +33,12 @@ function formatDateToDMY(dateInput) {
 function calcDaysLeft(deadline) {
   if (!deadline) return "";
   const now = new Date();
-  const d = new Date(deadline);
+  let d;
+  if (typeof deadline === "object" && deadline._seconds) {
+    d = new Date(deadline._seconds * 1000);
+  } else {
+    d = new Date(deadline);
+  }
   if (Number.isNaN(d.getTime())) return "";
   const nowMid = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const dMid = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
@@ -33,30 +47,21 @@ function calcDaysLeft(deadline) {
   if (diffDays === 0) return "D-0";
   return `D+${Math.abs(diffDays)}`;
 }
-
-function resolveImage(imageField, fallbackSeed) {
-  if (!imageField)
-    return `https://picsum.photos/seed/${encodeURIComponent(fallbackSeed)}/400/200`;
-  if (typeof imageField === "string" && imageField.trim() !== "") return imageField;
-  if (typeof imageField === "object") {
-    if (imageField.url) return imageField.url;
-    if (imageField.path) return imageField.path;
-    if (imageField.src) return imageField.src;
-    if (imageField.data && imageField.data.url) return imageField.data.url;
+function resolveImage(imageField, index, projectId) {
+  if (typeof imageField === "string" && imageField.trim() !== "" && imageField !== "null" && imageField !== "undefined") {
+    return imageField;
   }
-  return `https://picsum.photos/seed/${encodeURIComponent(fallbackSeed)}/400/200`;
+  // Generate random but consistent fallback
+  return `https://picsum.photos/seed/${encodeURIComponent(projectId || index)}/400/250`;
 }
-
 function normalizeTags(tagsField) {
   if (!tagsField) return [];
   if (Array.isArray(tagsField)) {
     return tagsField
       .map((t) => {
-        if (!t && t !== 0) return "";
+        if (!t) return "";
         if (typeof t === "string") return t;
-        if (typeof t === "object") {
-          return t.name || t.title || t.tag || t.label || t.value || JSON.stringify(t);
-        }
+        if (typeof t === "object") return t.name || t.title || t.value || JSON.stringify(t);
         return String(t);
       })
       .filter(Boolean);
@@ -67,34 +72,28 @@ function normalizeTags(tagsField) {
 }
 
 function normalizeMembers(membersField) {
-  if (!membersField) return [];
-  if (!Array.isArray(membersField)) return [];
+  if (!membersField || !Array.isArray(membersField)) return [];
   return membersField.map((m, i) => {
-    if (!m)
-      return { id: `m-${i}`, avatar: `https://i.pravatar.cc/40?img=${(i % 70) + 1}` };
-    if (typeof m === "string")
-      return { id: m, avatar: `https://i.pravatar.cc/40?img=${(i % 70) + 1}` };
+    if (!m) return { id: `m-${i}`, name: "Unknown", avatar: `https://i.pravatar.cc/40?img=${i + 1}` };
     return {
       id: m.id || m._id || m.userId || `m-${i}`,
+      name: m.name || m.fullName || m.userId || "Member",
+      role: m.role || "member",
+      joinedAt: m.joinedAt && m.joinedAt._seconds ? new Date(m.joinedAt._seconds * 1000) : null,
       avatar:
         m.avatar ||
-        m.avatarUrl ||
-        m.photo ||
-        m.profilePic ||
-        `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
-      name: m.name || m.fullName || null,
+        `https://i.pravatar.cc/40?u=${encodeURIComponent(m.userId || m.name || `m-${i}`)}`,
     };
   });
 }
-/* ------------------ AddMemberModal (fixed hook order) ------------------ */
+
+/* ------------------ AddMemberModal ------------------ */
 function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
-  // ---- ALL hooks must be defined unconditionally at top ----
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Reset local modal state whenever modal is closed/opened
   useEffect(() => {
     if (!open) {
       setEmail("");
@@ -104,9 +103,8 @@ function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
     }
   }, [open]);
 
-  // Keyboard escape handler — also unconditional hook
   useEffect(() => {
-    if (!open) return; // still ok to early-return inside effect body
+    if (!open) return;
     const onKey = (ev) => {
       if (ev.key === "Escape") onClose();
     };
@@ -114,7 +112,6 @@ function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // ---- now it's safe to short-circuit render if not open ----
   if (!open) return null;
 
   const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
@@ -131,7 +128,6 @@ function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
 
     try {
       setSubmitting(true);
-      // onSubmit is provided by parent and returns a Promise
       await onSubmit(email);
       setSuccess("Member added successfully.");
       setTimeout(() => {
@@ -147,33 +143,35 @@ function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
   };
 
   return (
-    <div className="am-backdrop" role="dialog" aria-modal="true" aria-label="Add team member">
+    <div className="am-backdrop" role="dialog" aria-modal="true">
       <div className="am-modal">
         <h3 className="am-title">Add team member</h3>
-        {projectTitle && <div className="am-sub">Project: <strong>{projectTitle}</strong></div>}
-
+        {projectTitle && (
+          <div className="am-sub">
+            Project: <strong>{projectTitle}</strong>
+          </div>
+        )}
         <form className="am-form" onSubmit={handleSubmit}>
-          <label className="field-label" htmlFor="am-email">Member email</label>
+          <label htmlFor="am-email" className="field-label">
+            Member email
+          </label>
           <input
             id="am-email"
-            className="field-input"
             type="email"
+            className="field-input"
             placeholder="name@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={submitting}
             autoFocus
           />
-
-          {error && <div className="am-error" role="alert">{error}</div>}
-          {success && <div className="am-success" role="status">{success}</div>}
-
+          {error && <div className="am-error">{error}</div>}
+          {success && <div className="am-success">{success}</div>}
           <div className="am-actions">
             <button type="button" className="btn discard" onClick={onClose} disabled={submitting}>
               Cancel
             </button>
             <button type="submit" className="btn save" disabled={submitting}>
-              {submitting ? <span className="spinner" aria-hidden /> : null}
               {submitting ? "Adding..." : "Add member"}
             </button>
           </div>
@@ -183,7 +181,7 @@ function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
   );
 }
 
-/* ------------------ ProjectsPage (same integration) ------------------ */
+/* ------------------ ProjectsPage ------------------ */
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -199,20 +197,14 @@ export default function ProjectsPage() {
     async function fetchProjects() {
       setLoading(true);
       setError(null);
-
       try {
         const token = localStorage.getItem("jwtToken");
-        if (!token) {
-          throw new Error("No jwtToken found in localStorage");
-        }
+        if (!token) throw new Error("No jwtToken found in localStorage");
 
         const res = await fetch(API_URL, {
           method: "GET",
           signal: controller.signal,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
@@ -221,33 +213,28 @@ export default function ProjectsPage() {
         }
 
         const data = await res.json();
-
         let list = [];
         if (Array.isArray(data)) list = data;
-        else if (data && Array.isArray(data.data)) list = data.data;
-        else if (data && data.data && typeof data.data === "object") list = [data.data];
-        else if (data && Array.isArray(data.items)) list = data.items;
-        else if (data && Array.isArray(data.projects)) list = data.projects;
-        else if (data && typeof data === "object" && (data.name || data.tags || data.deadline || data.imageUrl)) list = [data];
-        else list = [];
+        else if (Array.isArray(data.data)) list = data.data;
+        else if (Array.isArray(data.projects)) list = data.projects;
+        else if (data && typeof data === "object") list = [data];
 
-        const mapped = list
-          .filter((p) => !!p && typeof p === "object")
-          .map((p, idx) => {
-            const id = p.id || p._id || p._idString || p._id || `p-${idx}`;
-            const title = p.name || p.title || p.projectName || "Untitled Project";
-            const tags = normalizeTags(p.tags || p.tagList || p.categories || p.category);
-            const image = resolveImage(p.imageUrl || p.image || p.thumbnail || (p.cover && p.cover.url), id);
-            const rawDeadline = p.deadline || p.dueDate || p.deadlineAt || null;
-            const deadline = formatDateToDMY(rawDeadline);
-            const daysLeft = calcDaysLeft(rawDeadline);
-            const members = normalizeMembers(p.members || p.team || p.participants);
-            const tasksCount = Array.isArray(p.tasks) ? p.tasks.length : typeof p.tasksCount === "number" ? p.tasksCount : p.taskCount || 0;
-            const description = p.description || p.desc || "";
-            const priority = p.priority || p.priorityLevel || "";
-            return { id, title, tags, image, deadline, daysLeft, members, tasksCount, description, priority, raw: p };
-          });
-
+        const mapped = list.map((p, idx) => {
+          const id = p.id || p._id || `p-${idx}`;
+          const title = p.name || p.title || "Untitled Project";
+          const tags = normalizeTags(p.tags);
+        const image = resolveImage(p.imageUrl || p.image, idx, id); // ✅ fixed
+          const deadline = formatDateToDMY(p.deadline);
+          const daysLeft = calcDaysLeft(p.deadline);
+          const members = normalizeMembers(p.members || p.team);
+          const tasksCount = Array.isArray(p.tasks) ? p.tasks.length : 0;
+          const description =
+            typeof p.description === "string"
+              ? p.description
+              : JSON.stringify(p.description || "");
+          const priority = p.priority || "";
+          return { id, title, tags, image, deadline, daysLeft, members, tasksCount, description, priority, raw: p };
+        });
         if (isMounted) setProjects(mapped);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
@@ -258,7 +245,6 @@ export default function ProjectsPage() {
     }
 
     fetchProjects();
-
     return () => {
       isMounted = false;
       controller.abort();
@@ -284,11 +270,8 @@ export default function ProjectsPage() {
 
     const res = await fetch(`${API_URL}/${encodeURIComponent(projectId)}/team`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ email }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ projectId, email }),
     });
 
     if (!res.ok) {
@@ -302,17 +285,21 @@ export default function ProjectsPage() {
     }
 
     const json = await res.json();
-    const newMember = json.member;
+    const m = json.member || json.data || json;
 
     const memberUi = {
-      id: newMember.userId || `u-${Date.now()}`,
-      name: newMember.name || newMember.userId || "Member",
-      role: newMember.role || "member",
-      joinedAt: newMember.joinedAt || new Date().toISOString(),
-      avatar: `https://i.pravatar.cc/40?u=${encodeURIComponent(newMember.userId || newMember.name || email)}`,
+      id: m.userId || m.id || `u-${Date.now()}`,
+      name: m.name || m.userId || "Member",
+      role: m.role || "member",
+      joinedAt: m.joinedAt || new Date().toISOString(),
+      avatar: `https://i.pravatar.cc/40?u=${encodeURIComponent(m.userId || m.name || email)}`,
     };
 
-    setProjects((prev) => prev.map((p) => (p.id === projectId ? { ...p, members: [...(p.members || []), memberUi] } : p)));
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId ? { ...p, members: [...(p.members || []), memberUi] } : p
+      )
+    );
 
     return json;
   };
@@ -320,13 +307,7 @@ export default function ProjectsPage() {
   return (
     <div className="projects-page-container">
       {loading && <div className="projects-loading">Loading projects…</div>}
-
-      {error && (
-        <div className="projects-error">
-          <p>Could not load projects: {error}</p>
-        </div>
-      )}
-
+      {error && <div className="projects-error"><p>{error}</p></div>}
       {!loading && !error && (
         <ProjectsGrid
           projects={projects}
@@ -336,17 +317,11 @@ export default function ProjectsPage() {
           onAddMember={openAddMemberModal}
         />
       )}
-
       {!loading && !error && projects.length === 0 && (
         <div className="projects-empty">
-          No projects found. Click{" "}
-          <button onClick={handleNew} className="link-like">
-            New Project
-          </button>{" "}
-          to create one.
+          <div className="alert alert-danger">No projects found.</div>
         </div>
       )}
-
       <AddMemberModal
         open={!!modalOpenFor}
         onClose={closeModal}

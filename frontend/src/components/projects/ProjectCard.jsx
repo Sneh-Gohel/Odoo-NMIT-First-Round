@@ -3,7 +3,7 @@ import "./projects.css";
 
 /** Robust avatar resolver */
 function resolveAvatar(m, idx) {
-  if (!m) return `https://i.pravatar.cc/40?img=${(idx % 70) + 1}`;
+  if (!m) return `/images/avatars/avatar${(idx % 6) + 1}.png`;
   if (typeof m === "string") return m;
   if (typeof m === "object") {
     if (typeof m.avatar === "string" && m.avatar.trim()) return m.avatar;
@@ -20,13 +20,15 @@ function resolveAvatar(m, idx) {
 
     if (m.profile && typeof m.profile === "object") {
       if (typeof m.profile.url === "string" && m.profile.url.trim()) return m.profile.url;
-      if (m.profile.image && typeof m.profile.image === "object" && typeof m.profile.image.url === "string") return m.profile.image.url;
+      if (m.profile.image && typeof m.profile.image === "object" && typeof m.profile.image.url === "string")
+        return m.profile.image.url;
     }
 
     if (m.user && typeof m.user === "object") {
       if (typeof m.user.avatar === "string" && m.user.avatar.trim()) return m.user.avatar;
       if (m.user.avatarUrl && typeof m.user.avatarUrl === "string") return m.user.avatarUrl;
-      if (m.user.profile && typeof m.user.profile === "object" && typeof m.user.profile.url === "string") return m.user.profile.url;
+      if (m.user.profile && typeof m.user.profile === "object" && typeof m.user.profile.url === "string")
+        return m.user.profile.url;
     }
 
     if (m.data && typeof m.data === "object") {
@@ -34,11 +36,11 @@ function resolveAvatar(m, idx) {
       if (typeof m.data.avatar === "string") return m.data.avatar;
     }
 
-    if (m.id && typeof m.id === "string") return `https://i.pravatar.cc/40?u=${encodeURIComponent(m.id)}`;
+    if (m.id && typeof m.id === "string") return `/images/avatars/avatar${(idx % 6) + 1}.png`;
 
-    return `https://i.pravatar.cc/40?img=${(idx % 70) + 1}`;
+    return `/images/avatars/avatar${(idx % 6) + 1}.png`;
   }
-  return `https://i.pravatar.cc/40?img=${(idx % 70) + 1}`;
+  return `/images/avatars/avatar${(idx % 6) + 1}.png`;
 }
 
 /** Safely get member name for tooltip */
@@ -82,6 +84,10 @@ export default function ProjectCard({
 }) {
   const handleCardClick = () => onOpen(id);
 
+  // ✅ Always provide fallback project image
+  const fallbackImage = "/images/projects/default.jpg";
+  const displayImage = image && image.trim() !== "" ? image : fallbackImage;
+
   return (
     <div
       className="card ps-card h-100"
@@ -94,11 +100,11 @@ export default function ProjectCard({
         role="button"
         tabIndex={0}
       >
-        {image ? (
-          <img src={image} className="ps-thumb-img" alt={`${title} cover`} />
-        ) : (
-          <div className="ps-thumb-empty">No image</div>
-        )}
+        <img
+          src={displayImage}
+          className="ps-thumb-img"
+          alt={`${title} cover`}
+        />
 
         <button
           type="button"
@@ -176,7 +182,6 @@ export default function ProjectCard({
                 {tasksCount} Tasks
               </button>
 
-              {/* Assign button — visible and calls parent onAddMember */}
               <button
                 type="button"
                 className="btn ps-add-member"
