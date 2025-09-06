@@ -1,13 +1,14 @@
-import React from 'react'
-import Navbar from '../../components/Navbar/Navbar'
+import React from "react";
+import Navbar from "../../components/Navbar/Navbar";
+import About from "../../components/About/About";
 
 const LandingPage = () => {
   return (
     <div>
-        <Navbar />
-        <h1>Hello</h1>
+      <Navbar />
+      <About />
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;
