@@ -15,6 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<LandingPage />} />
+        
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/login" replace />} />

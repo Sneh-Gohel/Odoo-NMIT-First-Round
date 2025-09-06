@@ -1,0 +1,108 @@
+/* Footer.css with theme support */
+.footer {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--text));
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.footer-heading {
+  color: rgb(var(--text));
+  border-color: rgb(var(--muted)) !important;
+}
+
+.footer-tagline {
+  color: rgb(var(--muted));
+  margin: 0;
+}
+
+.footer-link {
+  color: rgb(var(--muted));
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: rgb(var(--primary-1));
+}
+
+.logo__gradient {
+  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* Social icons */
+.social-icon {
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: rgb(var(--muted));
+}
+
+.social-icon:hover {
+  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
+  color: white !important;
+  transform: translateY(-3px);
+}
+
+/* Form elements */
+.newsletter-input {
+  background-color: rgba(var(--muted), 0.1);
+  border: 1px solid rgba(var(--muted), 0.3);
+  color: rgb(var(--text));
+  transition: all 0.3s ease;
+}
+
+.newsletter-input:focus {
+  background-color: rgba(var(--muted), 0.15);
+  border-color: rgb(var(--primary-1));
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-1), 0.25);
+  color: rgb(var(--text));
+  outline: none;
+}
+
+.newsletter-input::placeholder {
+  color: rgba(var(--muted), 0.7);
+}
+
+.newsletter-btn {
+  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.newsletter-btn:hover {
+  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.footer-divider {
+  border-color: rgba(var(--muted), 0.3) !important;
+}
+
+.footer-copyright {
+  color: rgb(var(--muted));
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+  }
+  
+  .logo__gradient {
+    font-size: 1.8rem;
+  }
+}
