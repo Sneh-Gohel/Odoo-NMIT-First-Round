@@ -38,6 +38,9 @@ function Signup() {
   const [infoMessage, setInfoMessage] = useState("");
   const [resendCountdown, setResendCountdown] = useState(0);
 
+  // last submitted payload (for debugging/printing)
+  const [submittedPayload, setSubmittedPayload] = useState(null);
+
   // Simple validation for the initial signup form
   const validate = () => {
     const newErrors = {};
@@ -98,6 +101,10 @@ function Signup() {
         password: formData.password,
       };
 
+      // Save & print payload for debugging
+      setSubmittedPayload(payload);
+      console.log("Submitted initiate payload:", payload);
+
       const res = await axios.post(API_URL_INIT, payload, {
         headers: { "Content-Type": "application/json" },
         timeout: 15000,
@@ -143,6 +150,10 @@ function Signup() {
         otp: otp.trim(),
       };
 
+      // Save & print verify payload for debugging
+      setSubmittedPayload(payload);
+      console.log("Submitted verify payload:", payload);
+
       const res = await axios.post(API_URL_VERIFY, payload, {
         headers: { "Content-Type": "application/json" },
         timeout: 15000,
@@ -186,6 +197,11 @@ function Signup() {
         email: formData.email.trim(),
         password: formData.password,
       };
+
+      // Save payload for debugging when resending too
+      setSubmittedPayload(payload);
+      console.log("Resend initiate payload:", payload);
+
       const res = await axios.post(API_URL_INIT, payload, {
         headers: { "Content-Type": "application/json" },
         timeout: 15000,
@@ -324,6 +340,16 @@ function Signup() {
                         Already have an account? <Link to="/login" className="login-link">Login</Link>
                       </p>
                     </div>
+
+                    {/* Debug: show last submitted payload */}
+                    {submittedPayload && (
+                      <div className="mt-3">
+                        <h6 className="mb-1">Last submitted payload (initiate):</h6>
+                        <pre className="p-2 bg-light border rounded" style={{whiteSpace: "pre-wrap"}}>
+                          {JSON.stringify(submittedPayload, null, 2)}
+                        </pre>
+                      </div>
+                    )}
                   </form>
                 )}
 
@@ -382,6 +408,16 @@ function Signup() {
                         Need to change email? <button className="btn btn-link p-0" onClick={() => setStep("form")}>Edit details</button>
                       </p>
                     </div>
+
+                    {/* Debug: show last submitted payload (verify) */}
+                    {submittedPayload && (
+                      <div className="mt-3">
+                        <h6 className="mb-1">Last submitted payload (verify or initiate):</h6>
+                        <pre className="p-2 bg-light border rounded" style={{whiteSpace: "pre-wrap"}}>
+                          {JSON.stringify(submittedPayload, null, 2)}
+                        </pre>
+                      </div>
+                    )}
                   </form>
                 )}
 
@@ -391,6 +427,16 @@ function Signup() {
                       {infoMessage || "Signup complete. Redirecting..."}
                     </div>
                     <p>You will be redirected to login shortly.</p>
+
+                    {/* final payload print (if any) */}
+                    {submittedPayload && (
+                      <div className="mt-3">
+                        <h6 className="mb-1">Last submitted payload:</h6>
+                        <pre className="p-2 bg-light border rounded" style={{whiteSpace: "pre-wrap"}}>
+                          {JSON.stringify(submittedPayload, null, 2)}
+                        </pre>
+                      </div>
+                    )}
                   </div>
                 )}
 
