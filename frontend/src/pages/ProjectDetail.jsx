@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../components/projects/projects.css";
 
-// API roots
 const API_ROOT = "http://192.168.137.3:3333/v1/projects";
+const DETAILS_ENDPOINT = `${API_ROOT}/details`;
 const TASKS_ROOT = "http://192.168.137.3:3333/v1/tasks";
 
-/* Helpers (same as before) */
+/* Helpers */
 function firebaseTsToDate(ts) {
   if (!ts) return null;
   if (typeof ts === "object" && ts._seconds != null) return new Date(ts._seconds * 1000);
@@ -23,54 +23,36 @@ function shortDateIso(d) {
 function avatarFor(m, i) {
   if (!m) return `https://i.pravatar.cc/40?img=${(i % 70) + 1}`;
   if (typeof m === "string") return m;
-  return m.avatar || m.avatarUrl || `https://i.pravatar.cc/40?u=${encodeURIComponent(m.id || m.userId || i)}`;
+  return m.avatar || m.avatarUrl || `https://i.pravatar.cc/40?u=${encodeURIComponent(m.userId || m.id || i)}`;
 }
 
-/* Small modal + UI components (unchanged) */
-/* ... AddMemberModal, AddTaskModal, AssignModal, TaskRow ... */
-/* For brevity I won't repeat them here — keep the same components as in your current file. */
+/* --- small inline modal components --- */
+/* AddMemberModal, AddTaskModal, AssignModal, TaskRow
+   (Same as in your existing file — keep them unchanged) */
+/* For brevity in this snippet, assume you copy the same modal components
+   you already had (AddMemberModal, AddTaskModal, AssignModal, TaskRow).
+   I'll include them at the end if you want the full copy. */
 
+/* I'll include them inline so file is self-contained: */
 function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
-  const [success, setSuccess] = useState(null);
-
-  useEffect(() => {
-    if (!open) {
-      setEmail("");
-      setErr(null);
-      setSuccess(null);
-      setLoading(false);
-    }
-  }, [open]);
-
+  React.useEffect(() => { if (!open) { setEmail(""); setErr(null); setLoading(false); } }, [open]);
   if (!open) return null;
-
   const validateEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-
   const submit = async (e) => {
     e.preventDefault();
     setErr(null);
-    if (!validateEmail(email)) {
-      setErr("Please enter a valid email.");
-      return;
-    }
+    if (!validateEmail(email)) { setErr("Please enter a valid email."); return; }
     try {
       setLoading(true);
       await onSubmit(email);
-      setSuccess("Member added.");
-      setTimeout(() => {
-        setSuccess(null);
-        setLoading(false);
-        onClose();
-      }, 700);
+      onClose();
     } catch (error) {
       setErr(error?.message || "Failed to add member");
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
-
   return (
     <div className="am-backdrop" role="dialog" aria-modal="true">
       <div className="am-modal">
@@ -78,9 +60,8 @@ function AddMemberModal({ open, onClose, onSubmit, projectTitle }) {
         {projectTitle && <div className="am-sub">Project: <strong>{projectTitle}</strong></div>}
         <form className="am-form" onSubmit={submit}>
           <label className="field-label">Email</label>
-          <input className="field-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" autoFocus disabled={loading} />
+          <input className="field-input" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="email@example.com" autoFocus disabled={loading} />
           {err && <div className="am-error">{err}</div>}
-          {success && <div className="am-success">{success}</div>}
           <div className="am-actions">
             <button type="button" className="btn discard" onClick={onClose} disabled={loading}>Cancel</button>
             <button type="submit" className="btn save" disabled={loading}>{loading ? "Adding..." : "Add member"}</button>
@@ -100,27 +81,17 @@ function AddTaskModal({ open, onClose, onSubmit, members = [] }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!open) {
-      setTitle("");
-      setDescription("");
-      setAssigneeId("");
-      setDueDate("");
-      setPriority("Medium");
-      setLoading(false);
-      setErr(null);
+      setTitle(""); setDescription(""); setAssigneeId(""); setDueDate(""); setPriority("Medium"); setLoading(false); setErr(null);
     }
   }, [open]);
 
   if (!open) return null;
-
-  const handle = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setErr(null);
-    if (!title.trim()) {
-      setErr("Title is required");
-      return;
-    }
+    if (!title.trim()) { setErr("Title is required"); return; }
     try {
       setLoading(true);
       await onSubmit({
@@ -131,37 +102,34 @@ function AddTaskModal({ open, onClose, onSubmit, members = [] }) {
         status: "To-Do",
         priority,
       });
-      setLoading(false);
       onClose();
     } catch (error) {
       setErr(error?.message || "Failed to add task");
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
     <div className="am-backdrop" role="dialog" aria-modal="true">
       <div className="am-modal">
         <h3 className="am-title">Add Task</h3>
-        <form className="am-form" onSubmit={handle}>
+        <form className="am-form" onSubmit={submit}>
           <label className="field-label">Title</label>
-          <input className="field-input" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+          <input className="field-input" value={title} onChange={(e)=>setTitle(e.target.value)} autoFocus />
           <label className="field-label">Description</label>
-          <textarea className="field-textarea" value={description} onChange={(e) => setDescription(e.target.value)} />
+          <textarea className="field-textarea" value={description} onChange={(e)=>setDescription(e.target.value)} />
           <label className="field-label">Assignee</label>
-          <select className="field-input" value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)}>
+          <select className="field-input" value={assigneeId} onChange={(e)=>setAssigneeId(e.target.value)}>
             <option value="">Unassigned</option>
-            {members.map((m) => <option key={m.id} value={m.id}>{m.name || m.email || m.id}</option>)}
+            {members.map((m)=> <option key={m.id} value={m.id}>{m.name || m.email || m.id}</option>)}
           </select>
           <label className="field-label">Due date</label>
-          <input className="field-input" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          <input className="field-input" type="date" value={dueDate} onChange={(e)=>setDueDate(e.target.value)} />
           <label className="field-label">Priority</label>
-          <select className="field-input" value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <select className="field-input" value={priority} onChange={(e)=>setPriority(e.target.value)}>
             <option>Low</option>
             <option>Medium</option>
             <option>High</option>
           </select>
-
           {err && <div className="am-error">{err}</div>}
           <div className="am-actions">
             <button type="button" className="btn discard" onClick={onClose} disabled={loading}>Cancel</button>
@@ -178,30 +146,22 @@ function AssignModal({ open, onClose, task, members = [], onSave }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
-  useEffect(() => {
-    if (!open) {
-      setAssigneeId(task?.assigneeId || "");
-      setLoading(false);
-      setErr(null);
-    } else {
-      setAssigneeId(task?.assigneeId || "");
-    }
+  React.useEffect(() => {
+    if (!open) { setAssigneeId(task?.assigneeId || ""); setLoading(false); setErr(null); }
+    else setAssigneeId(task?.assigneeId || "");
   }, [open, task]);
 
   if (!open) return null;
-
   const submit = async (e) => {
     e.preventDefault();
     setErr(null);
     try {
       setLoading(true);
       await onSave(assigneeId || null);
-      setLoading(false);
       onClose();
     } catch (error) {
       setErr(error?.message || "Failed to assign");
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -210,11 +170,10 @@ function AssignModal({ open, onClose, task, members = [], onSave }) {
         <h3 className="am-title">Assign Task</h3>
         <form className="am-form" onSubmit={submit}>
           <label className="field-label">Assign to</label>
-          <select className="field-input" value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)}>
+          <select className="field-input" value={assigneeId} onChange={(e)=>setAssigneeId(e.target.value)}>
             <option value="">Unassigned</option>
-            {members.map((m) => <option key={m.id} value={m.id}>{m.name || m.email || m.id}</option>)}
+            {members.map((m)=> <option key={m.id} value={m.id}>{m.name || m.email || m.id}</option>)}
           </select>
-
           {err && <div className="am-error">{err}</div>}
           <div className="am-actions">
             <button type="button" className="btn discard" onClick={onClose} disabled={loading}>Cancel</button>
@@ -238,12 +197,10 @@ function TaskRow({ t, members, onOpenAssign }) {
           <small style={{ marginLeft: 12 }}>Priority: {t.priority}</small>
         </div>
       </div>
-
       <div className="task-right">
         <div className="task-assignee">
           {assignee ? <img src={assignee.avatar} className="member-avatar" alt={assignee.name || assignee.email} title={assignee.name || assignee.email} /> : <div className="unassigned">—</div>}
         </div>
-
         <div className="task-actions">
           <button className="btn" onClick={() => onOpenAssign(t)} title="Assign / reassign"><i className="fa-solid fa-user-pen" /> Assign</button>
         </div>
@@ -270,6 +227,15 @@ export default function ProjectDetail() {
     let mounted = true;
     const controller = new AbortController();
 
+    async function tryJson(res) {
+      try {
+        const json = await res.json();
+        return json && json.data ? json.data : json;
+      } catch (err) {
+        return null;
+      }
+    }
+
     async function load() {
       setLoading(true);
       setError(null);
@@ -277,14 +243,53 @@ export default function ProjectDetail() {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       try {
-        // Try single-project endpoint first
-        const res = await fetch(`${API_ROOT}/${encodeURIComponent(id)}`, { headers, signal: controller.signal });
-        let rawProject;
-        if (res.ok) {
-          const json = await res.json();
-          rawProject = json && json.data ? json.data : json;
-        } else {
-          // fallback: fetch all and find
+        let rawProject = null;
+
+        // 1) try GET /v1/projects/details?id=<id>
+        try {
+          const q = `${DETAILS_ENDPOINT}?id=${encodeURIComponent(id)}`;
+          const res = await fetch(q, { headers, signal: controller.signal });
+          if (res.ok) {
+            const body = await tryJson(res);
+            if (body) rawProject = body;
+          }
+        } catch (err) {
+          if (err.name === "AbortError") throw err;
+        }
+
+        // 2) try POST /v1/projects/details { id }
+        if (!rawProject) {
+          try {
+            const res = await fetch(DETAILS_ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...(headers) },
+              body: JSON.stringify({ id }),
+              signal: controller.signal,
+            });
+            if (res.ok) {
+              const body = await tryJson(res);
+              if (body) rawProject = body;
+            }
+          } catch (err) {
+            if (err.name === "AbortError") throw err;
+          }
+        }
+
+        // 3) try GET /v1/projects/:id
+        if (!rawProject) {
+          try {
+            const res = await fetch(`${API_ROOT}/${encodeURIComponent(id)}`, { headers, signal: controller.signal });
+            if (res.ok) {
+              const body = await tryJson(res);
+              if (body) rawProject = body;
+            }
+          } catch (err) {
+            if (err.name === "AbortError") throw err;
+          }
+        }
+
+        // 4) fallback: fetch all list and find
+        if (!rawProject) {
           const resAll = await fetch(API_ROOT, { headers, signal: controller.signal });
           if (!resAll.ok) throw new Error(`Failed to fetch projects list: ${resAll.status}`);
           const listJson = await resAll.json();
@@ -293,8 +298,8 @@ export default function ProjectDetail() {
           if (!rawProject) throw new Error("Project not found");
         }
 
-        // normalize members
-        const rawMembers = rawProject.members || rawProject.team || [];
+        // normalize team -> members
+        const rawMembers = rawProject.team || rawProject.members || [];
         const members = (Array.isArray(rawMembers) ? rawMembers : []).map((m, i) => ({
           id: m.userId || m.id || m._id || `m-${i}`,
           name: m.name || m.fullName || m.email || null,
@@ -302,44 +307,11 @@ export default function ProjectDetail() {
           avatar: avatarFor(m, i),
         }));
 
-        const proj = {
-          id: rawProject.id || rawProject._id || id,
-          title: rawProject.name || rawProject.title || "Project",
-          description: rawProject.description || "",
-          tags: rawProject.tags || [],
-          deadline: firebaseTsToDate(rawProject.deadline) || null,
-          priority: rawProject.priority || "",
-          image: rawProject.imageUrl || rawProject.image || "",
-          members,
-          raw: rawProject,
-        };
-
-        // fetch tasks or fallback to rawProject.tasks
-        let tasksList = [];
-        try {
-          // FIRST try top-level tasks list with projectId filter (if your API supports it)
-          const q = `${TASKS_ROOT}?projectId=${encodeURIComponent(proj.id)}`;
-          const tres = await fetch(q, { headers, signal: controller.signal });
-          if (tres.ok) {
-            const tj = await tres.json();
-            tasksList = Array.isArray(tj) ? tj : (tj.data || tj.tasks || []);
-          } else {
-            // fallback to project-specific endpoint (if exists) or embedded tasks in project
-            const tres2 = await fetch(`${API_ROOT}/${encodeURIComponent(id)}/tasks`, { headers, signal: controller.signal });
-            if (tres2.ok) {
-              const tj2 = await tres2.json();
-              tasksList = Array.isArray(tj2) ? tj2 : (tj2.data || tj2.tasks || []);
-            } else {
-              tasksList = rawProject.tasks || [];
-            }
-          }
-        } catch (err) {
-          tasksList = rawProject.tasks || [];
-        }
-
-        const normalizedTasks = (tasksList || []).map((t, idx) => ({
+        // normalize tasks (server provided rawProject.tasks)
+        const rawTasks = rawProject.tasks || [];
+        const normalizedTasks = (Array.isArray(rawTasks) ? rawTasks : []).map((t, idx) => ({
           id: t.id || t._id || t.taskId || `task-${idx}-${Date.now()}`,
-          title: t.title || t.name,
+          title: t.title || t.name || "Untitled",
           description: t.description || t.desc || "",
           assigneeId: t.assigneeId || t.assignee || t.userId || null,
           dueDate: t.dueDate ? (t.dueDate._seconds ? new Date(t.dueDate._seconds * 1000).toISOString() : new Date(t.dueDate).toISOString()) : null,
@@ -347,6 +319,18 @@ export default function ProjectDetail() {
           status: t.status || "To-Do",
           raw: t,
         }));
+
+        const proj = {
+          id: rawProject.id || rawProject._id || id,
+          title: rawProject.name || rawProject.title || "Project",
+          description: rawProject.description || rawProject.desc || "",
+          tags: rawProject.tags || [],
+          deadline: firebaseTsToDate(rawProject.deadline) || null,
+          priority: rawProject.priority || "",
+          image: rawProject.imageUrl || rawProject.image || "",
+          members,
+          raw: rawProject,
+        };
 
         if (!mounted) return;
         setProject(proj);
@@ -363,7 +347,7 @@ export default function ProjectDetail() {
     return () => { mounted = false; controller.abort(); };
   }, [id]);
 
-  /* Add team member (unchanged) */
+  /* Add team member */
   const handleAddMember = async (email) => {
     if (!project) throw new Error("No project loaded");
     const token = localStorage.getItem("jwtToken");
@@ -395,19 +379,18 @@ export default function ProjectDetail() {
     return json;
   };
 
-  /* Add task — POST to /v1/tasks (top-level) */
+  /* Add task */
   const handleAddTask = async (payload) => {
     if (!project) throw new Error("No project loaded");
     const token = localStorage.getItem("jwtToken");
     if (!token) throw new Error("Not authenticated");
 
-    // body as your server expects (projectId included)
     const body = {
       projectId: project.id,
       title: payload.title,
       description: payload.description,
       assigneeId: payload.assigneeId || null,
-      dueDate: payload.dueDate || null, // backend accepts e.g. "2025-10-31"
+      dueDate: payload.dueDate || null,
       status: payload.status || "To-Do",
       priority: payload.priority || "Medium",
     };
@@ -424,7 +407,6 @@ export default function ProjectDetail() {
     }
 
     const json = await res.json();
-    // example server returns { message: "...", task: { ... } }
     const t = json.task || json.data || json;
     const taskUi = {
       id: t.id || t._id || `task-${Date.now()}`,
@@ -442,7 +424,7 @@ export default function ProjectDetail() {
     return json;
   };
 
-  /* Assign / reassign — POST to /v1/tasks/:taskId/assign (top-level) */
+  /* Assign / reassign */
   const handleAssignSave = async (task, newAssigneeId) => {
     if (!project) throw new Error("No project loaded");
     const token = localStorage.getItem("jwtToken");
@@ -514,7 +496,6 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* Modals */}
       <AddMemberModal open={addMemberOpen} onClose={() => setAddMemberOpen(false)} onSubmit={handleAddMember} projectTitle={project.title} />
       <AddTaskModal open={addTaskOpen} onClose={() => setAddTaskOpen(false)} onSubmit={handleAddTask} members={project.members} />
       <AssignModal open={!!assignTask} onClose={() => setAssignTask(null)} task={assignTask} members={project.members} onSave={(assigneeId) => handleAssignSave(assignTask, assigneeId)} />
