@@ -54,10 +54,12 @@
   
   .leftL {
     width: 32%;
+    z-index: -2 !important;
   }
   .rightL {
     width: 32%;
     top: 300px;
+    z-index: -2 !important;
   }
   .grp1{
     top: 0px !important;
