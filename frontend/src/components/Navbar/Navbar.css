@@ -1,5 +1,5 @@
 .nav__logo {
-  font-size: 24px;
+  font-size: 24px !important;
   font-weight: bold;
     color: rgb(var(--text));
 }
@@ -8,29 +8,6 @@
    We attach theme class to <html> (recommended for global theming).
    Adjust values to match your brand (#52a4b0 etc.). */
 
-:root,
-html.light {
-  --bg: 255 255 255;        /* white (rgb parts) */
-  --text: 17 24 39;         /* slate-900 */
-  --muted: 75 85 99;        /* gray-600 */
-  --nav-bg: 255 255 255;    /* navbar background */
-  --nav-text: 17 24 39;
-  --primary-1: 82 164 176;  /* brand color rgb parts */
-  --primary-2: 106 17 203;  /* secondary gradient color */
-  --btn-bg: 33 37 41;       /* btn dark bg rgb parts */
-}
-
-/* dark theme */
-html.dark {
-  --bg: 17 17 17;           /* near black */
-  --text: 245 245 245;      /* near white */
-  --muted: 148 163 184;     /* gray-400 */
-  --nav-bg: 25 25 25;
-  --nav-text: 245 245 245;
-  --primary-1: 82 164 176;
-  --primary-2: 106 17 203;
-  --btn-bg: 240 240 240;    /* light buttons on dark mode if needed */
-}
 
 /* Apply basic global styles (optional) */
 body {
@@ -65,6 +42,8 @@ body {
   -webkit-text-fill-color: transparent;
   color: transparent;
   font-weight: 700;
+  font-size: 24px !important;
+  margin: 0 2px;
 }
 
 /* Theme toggle button */

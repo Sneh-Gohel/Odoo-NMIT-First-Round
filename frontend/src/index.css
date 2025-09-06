@@ -5,9 +5,33 @@ body {
 }
 
 .logo__gradient {
-  background: linear-gradient(90deg, #7BB2FF, #FFA6EC);
+  background: linear-gradient(90deg, #7bb2ff, #ffa6ec);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
+}
+
+:root,
+html.light {
+  --bg: 255 255 255; /* white (rgb parts) */
+  --text: 17 24 39; /* slate-900 */
+  --muted: 75 85 99; /* gray-600 */
+  --nav-bg: 255 255 255; /* navbar background */
+  --nav-text: 17 24 39;
+  --primary-1: 82 164 176; /* brand color rgb parts */
+  --primary-2: 106 17 203; /* secondary gradient color */
+  --btn-bg: 33 37 41; /* btn dark bg rgb parts */
+}
+
+/* dark theme */
+html.dark {
+  --bg: 17 17 17; /* near black */
+  --text: 245 245 245; /* near white */
+  --muted: 148 163 184; /* gray-400 */
+  --nav-bg: 25 25 25;
+  --nav-text: 245 245 245;
+  --primary-1: 82 164 176;
+  --primary-2: 106 17 203;
+  --btn-bg: 240 240 240; /* light buttons on dark mode if needed */
 }
