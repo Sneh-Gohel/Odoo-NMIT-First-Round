@@ -1,3 +1,85 @@
 .hero{
     height: 100vh;
 }
+.newsletter-btn {
+  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
+  border: none;
+  color: white;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.scrol{
+    text-decoration: none;
+    color: white;
+}
+
+.leftL{
+    top :0px; !important;
+}
+.rightL{
+    top :50px; !important;
+    right:0px !important;
+}
+
+.grp1{
+    top: 150px !important;
+    left: 200px !important;
+    z-index: 10 !important;
+}
+.grp2{
+    top: 200px !important;
+    right: 500px !important;
+    z-index: -1 !important;
+}
+
+.grp3{
+    top: 350px !important;
+    right: 300px !important;
+    z-index: -1 !important;
+}
+
+.grp4{
+    top: 530px !important;
+    right: 650px !important;
+    z-index: -1 !important;
+}
+
+.head{
+    font-size: 3.5rem !important;
+}
+
+@media only screen and (max-width: 890px) {
+  
+  .leftL {
+    width: 32%;
+  }
+  .rightL {
+    width: 32%;
+    top: 300px;
+  }
+  .grp1{
+    top: 0px !important;
+    left: 200px !important;
+    z-index: 10 !important;
+}
+.grp2{
+    top: 100px !important;
+    right: 600px !important;
+    z-index: -1 !important;
+}
+
+.grp3{
+    top: 350px !important;
+    right: 300px !important;
+    z-index: -1 !important;
+}
+
+.grp4{
+    top: 530px !important;
+    right: 650px !important;
+    z-index: -1 !important;
+}
+
+}

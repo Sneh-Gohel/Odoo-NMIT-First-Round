@@ -29,7 +29,7 @@ export default function TestimonialsMarquee({
 
     return (
       <>
-      
+        
         <div
           className={`marquee-track-wrapper ${reverse ? "reverse" : ""}`}
           key={idx}
