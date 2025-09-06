@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "./Login";
+import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import LandingPage from "./pages/LandingPage/LandingPage";
 function App() {
