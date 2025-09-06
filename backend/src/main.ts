@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { db } from './config/firebase'; // Import the initialized db instance
 import apiRoutes from './routes'; // <<< THE ONLY CHANGE IS HERE
+import path from 'path';
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +14,8 @@ const port = process.env.PORT || 8080;
 // --- Middleware ---
 app.use(cors());
 app.use(express.json());
+
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // --- API Routes ---
 // All routes will now be prefixed with /v1

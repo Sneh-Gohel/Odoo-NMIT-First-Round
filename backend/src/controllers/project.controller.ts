@@ -10,32 +10,40 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
       return res.status(401).json({ message: 'Authentication error, user not found.' });
     }
 
-    console.log('Received request to create project with body:', req.body);
+    const { name, description, tags, deadline, priority } = req.body;
+    const isCustom = req.body.isCustom === 'true';
 
-    const { name, description, tags, deadline, priority, imageUrl, isCustom } = req.body;
-
+    // Basic validation
     if (!name || !description || !deadline || !priority) {
       return res.status(400).json({ message: 'Missing required fields: name, description, deadline, priority.' });
     }
-    
-    // Fetch the user's display name to store with the project
+
+    let imageUrl = '';
+    if (isCustom) {
+      if (!req.file) {
+        return res.status(400).json({ message: 'A project image is required for custom projects.' });
+      }
+      imageUrl = `/uploads/${req.file.filename}`;
+    } else {
+      imageUrl = req.body.imageUrl || 'default-project-image';
+    }
+
     const userRecord = await admin.auth().getUser(user.uid);
-    const ownerName = userRecord.displayName || user.email; 
+    const ownerName = userRecord.displayName || user.email || '';
 
     const projectData: projectService.NewProjectData = {
       name,
       description,
-      tags: Array.isArray(tags) ? tags : [], 
+      tags: typeof tags === 'string' ? tags.split(',') : [],
       deadline: new Date(deadline),
       priority,
-      imageUrl: imageUrl || '',
-      isCustom: typeof isCustom === 'boolean' ? isCustom : false,
+      imageUrl: imageUrl,
+      isCustom: isCustom,
       ownerId: user.uid,
       ownerName: ownerName,
     };
 
     const newProject = await projectService.createProject(projectData);
-
     res.status(201).json({ message: 'Project created successfully!', project: newProject });
   } catch (error: any) {
     console.error('Error creating project:', error);
