@@ -31,7 +31,6 @@ export const createProject = async (projectData: NewProjectData) => {
   return newProject;
 };
 
-// This is the correct implementation that will now be used.
 export const getProjectDetails = async (projectId: string) => {
   const projectRef = db.collection('projects').doc(projectId);
   const projectDoc = await projectRef.get();
@@ -89,7 +88,26 @@ export const addTeamMember = async (projectId: string, newMemberEmail: string, r
   
   return newMemberData;
 };
-export function getProjectsForUser(userId: string) {
-  throw new Error('Function not implemented.');
-}
 
+// --- THIS IS THE CORRECT, FULLY IMPLEMENTED FUNCTION ---
+export const getProjectsForUser = async (userId: string) => {
+  const userProjects: any[] = [];
+  
+  const allProjectsSnapshot = await db.collection('projects').get();
+
+  for (const projectDoc of allProjectsSnapshot.docs) {
+    const projectData = projectDoc.data();
+
+    if (projectData.ownerId === userId) {
+      userProjects.push(projectData);
+      continue;
+    }
+
+    const teamMemberDoc = await projectDoc.ref.collection('team').doc(userId).get();
+    if (teamMemberDoc.exists) {
+      userProjects.push(projectData);
+    }
+  }
+
+  return userProjects;
+};
