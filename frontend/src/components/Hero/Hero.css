@@ -16,11 +16,11 @@
 }
 
 .leftL{
-    top :0px; !important;
+    top :0px !important;
     z-index: -2 !important;
 }
 .rightL{
-    top :50px; !important;
+    top :50px !important;
     right:0px !important;
     z-index: -2 !important;
 }
