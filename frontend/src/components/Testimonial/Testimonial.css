@@ -1,0 +1,174 @@
+:root {
+  --card-bg: 255 255 255;
+  --card-text: 17 24 39;
+  --card-radius: 12px;
+  --card-shadow: 0 8px 24px rgba(16,24,40,0.06);
+}
+.testimonial-title{
+    font-size: 2.5rem !important;
+      text-align: center;
+      margin-bottom: 10px;
+}
+/* Container */
+.testimonials-marquee {
+  width: 100%;
+  padding: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: transparent;
+  box-sizing: border-box;
+  margin-top: 500px;
+}
+
+/* Each wrapper holds one animated track */
+.marquee-track-wrapper {
+  overflow: hidden;
+  width: 100%;
+  /* CSS variables for animation, set inline by component */
+  --marquee-duration: 24s;
+  --card-gap: 20px;
+}
+
+/* The animated moving track (flex row) */
+.marquee-track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--card-gap);
+  /* move left: translateX from 0 to -50% of track width (since we duplicated) */
+  animation: marquee-left var(--marquee-duration) linear infinite;
+  will-change: transform;
+  padding: 6px 0;
+}
+
+/* Reverse direction for second row */
+.marquee-track-wrapper.reverse .marquee-track {
+  animation-name: marquee-right;
+}
+
+/* Pause animation when user hovers the wrapper */
+.marquee-track-wrapper:hover .marquee-track,
+.marquee-track-wrapper:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Cards */
+.testimonial-card {
+  display: flex;
+  align-items: center;
+  min-width: 260px; /* controls how many visible at once */
+  max-width: 360px;
+  background: rgb(var(--card-bg));
+  color: rgb(var(--card-text));
+  border-radius: var(--card-radius);
+  padding: 14px;
+  box-shadow: var(--card-shadow);
+  box-sizing: border-box;
+  gap: 12px;
+  flex-shrink: 0; /* important for horizontal scrolling */
+}
+
+/* avatar */
+.avatar-wrap {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* testimonial text + meta */
+.testimonial-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.testimonial-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  color: rgba(17,24,39,0.9);
+}
+
+.testimonial-meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(75,85,99,0.9);
+}
+
+.testimonial-meta .name {
+  font-weight: 700;
+  color: rgba(17,24,39,0.95);
+}
+
+/* make track respond on small screens */
+@media (max-width: 768px) {
+  .testimonial-card {
+    min-width: 220px;
+    padding: 12px;
+  }
+  .avatar-wrap {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+}
+
+/* keyframes:
+   We translate by -50% because we duplicated items inside track;
+   when first half scrolls out, the second half is the duplicate, creating a loop.
+*/
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* move by half because of duplicate */
+  }
+}
+
+/* Reverse scroll to right */
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--card-gap);
+  animation: marquee-left var(--marquee-duration) linear infinite;
+  will-change: transform;
+}
+
+/* second row reversed */
+.marquee-track-wrapper.reverse .marquee-track {
+  animation: marquee-right var(--marquee-duration) linear infinite;
+}
+
+@media only screen and (max-width: 890px) {
+ .testimonials-marquee{
+    margin-top: 300px;
+ } 
+}

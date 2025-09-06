@@ -1,108 +1,173 @@
-/* Footer.css with theme support */
+/* footer.css - Dark mode ready & responsive */
+
+/* Theme variables are expected on :root / html.light / html.dark */
+/* e.g. --bg, --text, --muted, --primary-1, --primary-2 are already defined */
+.footer-logo{
+  justify-self: start;
+}
 .footer {
   background-color: rgb(var(--bg));
   color: rgb(var(--text));
-  transition: background 180ms ease, color 180ms ease;
+  transition: background 220ms ease, color 220ms ease;
+  padding: 3rem 0;
+  /* remove fixed height/margin to keep layout natural */
+  display: block;
+  box-shadow: 0 -1px 20px rgba(0,0,0,0.03);
 }
 
+/* Container row spacing */
+.footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Brand / logo */
+.logo__gradient {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--primary-1)),
+    rgb(var(--primary-2))
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  display: inline-block;
+}
+
+/* Tagline */
+.footer-tagline {
+  color: rgba(var(--muted), 0.95);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* head / section headings */
 .footer-heading {
   color: rgb(var(--text));
-  border-color: rgb(var(--muted)) !important;
+  border-color: rgba(var(--muted), 0.18) !important;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
 }
 
-.footer-tagline {
-  color: rgb(var(--muted));
-  margin: 0;
-}
-
+/* links */
 .footer-link {
-  color: rgb(var(--muted));
-  transition: color 0.3s ease;
+  color: rgba(var(--muted), 0.95);
+  transition: color 180ms ease, transform 160ms ease;
 }
 
 .footer-link:hover {
   color: rgb(var(--primary-1));
+  transform: translateX(4px);
 }
 
-.logo__gradient {
-  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  display: inline-block;
-}
-
-/* Social icons */
+/* Social icons circle */
 .social-icon {
-  transition: all 0.3s ease;
+  transition: all 0.22s ease;
   width: 40px;
   height: 40px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: rgb(var(--muted));
+  color: rgba(var(--muted), 0.95);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid rgba(var(--muted), 0.06);
 }
 
 .social-icon:hover {
   background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
-  color: white !important;
-  transform: translateY(-3px);
+  color: #fff !important;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 }
 
-/* Form elements */
+/* newsletter input group */
 .newsletter-input {
-  background-color: rgba(var(--muted), 0.1);
-  border: 1px solid rgba(var(--muted), 0.3);
+  background-color: rgba(var(--muted), 0.06);
+  border: 1px solid rgba(var(--muted), 0.12);
   color: rgb(var(--text));
-  transition: all 0.3s ease;
-}
-
-.newsletter-input:focus {
-  background-color: rgba(var(--muted), 0.15);
-  border-color: rgb(var(--primary-1));
-  box-shadow: 0 0 0 0.2rem rgba(var(--primary-1), 0.25);
-  color: rgb(var(--text));
-  outline: none;
+  transition: all 180ms ease;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
 }
 
 .newsletter-input::placeholder {
-  color: rgba(var(--muted), 0.7);
+  color: rgba(var(--muted), 0.6);
 }
 
+.newsletter-input:focus {
+  outline: none;
+  border-color: rgb(var(--primary-1));
+  box-shadow: 0 4px 18px rgba(var(--primary-1), 0.08);
+}
+
+/* subscribe button */
 .newsletter-btn {
   background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
   border: none;
   color: white;
-  transition: all 0.3s ease;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
 .newsletter-btn:hover {
-  background: linear-gradient(90deg, rgb(var(--primary-1)), rgb(var(--primary-2)));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
+/* divider color */
 .footer-divider {
-  border-color: rgba(var(--muted), 0.3) !important;
+  border-color: rgba(var(--muted), 0.12) !important;
 }
 
+/* copyright text */
 .footer-copyright {
-  color: rgb(var(--muted));
+  color: rgba(var(--muted), 0.85);
   margin: 0;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Responsive behavior */
+@media (max-width: 991px) {
+  .footer .row > [class*="col-"] {
+    margin-bottom: 1.25rem;
+  }
+  .logo__gradient { font-size: 1.9rem; }
+}
+
+@media (max-width: 576px) {
   .footer {
-    text-align: center;
+    padding: 2rem 0;
   }
-  
-  .logo__gradient {
-    font-size: 1.8rem;
-  }
+  .logo__gradient { font-size: 1.6rem; display: block; }
+  .footer-tagline { margin-top: 0.25rem; font-size: 0.9rem; }
+  .social-icon { width: 36px; height: 36px; }
+  .newsletter-btn { padding: 0.55rem; }
+}
+
+/* tiny accessibility & polish */
+.footer a { text-decoration: none; }
+.footer .input-group { gap: 0.5rem; align-items: center; }
+
+/* ensure dark theme contrast - optional enhancements */
+html.dark .footer {
+  /* Slightly elevated bg for dark */
+  background: linear-gradient(180deg, rgb(18 18 18 / 0.98), rgb(15 15 15 / 0.98));
+  box-shadow: 0 -1px 30px rgba(0,0,0,0.55);
+}
+
+html.dark .social-icon {
+  border-color: rgba(255,255,255,0.04);
+}
+
+html.dark .newsletter-input {
+  background-color: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.06);
 }
