@@ -65,3 +65,53 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
     res.status(500).json({ message: 'Server error while fetching projects.' });
   }
 };
+
+export const addMember = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const requestorId = req.user?.uid;
+    if (!requestorId) {
+      return res.status(401).json({ message: 'Authentication error.' });
+    }
+
+    const { projectId } = req.params; // Get project ID from URL
+    const { email } = req.body; // Get new member's email from body
+
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide the email of the member to add.' });
+    }
+
+    const newMember = await projectService.addTeamMember(projectId, email, requestorId);
+    res.status(200).json({ message: 'Team member added successfully!', member: newMember });
+  } catch (error: any) {
+    // Customize error response based on the message from the service
+    if (error.message === 'Project not found.' || error.message === 'User with the specified email does not exist.') {
+      return res.status(404).json({ message: error.message });
+    }
+    if (error.message === 'Only the project owner can add team members.') {
+      return res.status(403).json({ message: error.message }); // 403 Forbidden
+    }
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getProjectById = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { projectId } = req.body;
+
+    if (!projectId) {
+      return res.status(400).json({ message: 'Project ID is required in the request body.' });
+    }
+    
+    const projectDetails = await projectService.getProjectDetails(projectId);
+    res.status(200).json(projectDetails);
+  } catch (error: any) {
+    // --- ADD THIS DETAILED LOG ---
+    console.error("🔴 Error in getProjectById controller:", error);
+    
+    if (error.message === 'Project not found.') {
+      return res.status(404).json({ message: error.message });
+    }
+    // This is the generic response you are seeing
+    res.status(500).json({ message: 'Server error while fetching project details.' });
+  }
+};
