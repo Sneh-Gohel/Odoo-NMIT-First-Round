@@ -13,7 +13,7 @@
 ---
 ## 🔗 Resources  
 - **Figma Prototype:** [Figma Link Here](https://www.figma.com/design/GNM1dfwKuIs66zhxJRWTp4/events?node-id=422-42&t=dIoAa4Ql7hcKHaYP-1)  
-- **Demo Video:** [Video Link Here](https://youtu.be/placeholder)  
+- **Demo Video:** [Video Link Here](https://drive.google.com/drive/folders/1P5vSUMeKus5I7IW4azhWLwCnSRMgHEjh?usp=drive_link)
 
 ## 🌐 Team Information  
 **Team Name:** Next()Gen  
