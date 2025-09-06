@@ -1,17 +1,13 @@
-// src/services/auth.service.ts
-
-import { db, admin } from '../config/firebase';
+import { db, admin, clientAuth } from '../config/firebase';
 import bcrypt from 'bcryptjs';
 import { sendOtpEmail } from './email.service';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import jwt from 'jsonwebtoken';
 
 const PENDING_USERS_COLLECTION = 'pendingUsers';
 
-/**
- * Step 1: Hashes password, generates OTP, saves temporarily, and sends email.
- */
-// ADD 'export' HERE
+
 export const initiateSignup = async (name: string, email: string, password:string) => {
-  // ... rest of the function code is correct
   try {
     await admin.auth().getUserByEmail(email);
     throw new Error('An account with this email already exists.');
@@ -31,12 +27,8 @@ export const initiateSignup = async (name: string, email: string, password:strin
   await sendOtpEmail(email, otp);
 };
 
-/**
- * Step 2: Verifies OTP and creates the user permanently.
- */
-// ADD 'export' HERE
 export const verifyAndCompleteSignup = async (email: string, otp: string) => {
-  // ... rest of the function code is correct
+
   const pendingUserRef = db.collection(PENDING_USERS_COLLECTION).doc(email);
   const doc = await pendingUserRef.get();
 
@@ -57,8 +49,6 @@ export const verifyAndCompleteSignup = async (email: string, otp: string) => {
 
   const userRecord = await admin.auth().createUser({
     email: data.email,
-    // Use the raw password from the temporary store for creation
-    // Firebase will handle hashing and salting internally.
     password: data.passwordHash, 
     displayName: data.name,
   });
@@ -71,4 +61,32 @@ export const verifyAndCompleteSignup = async (email: string, otp: string) => {
 
   await pendingUserRef.delete();
   return { uid: userRecord.uid, email: userRecord.email, name: userRecord.displayName };
+};
+
+export const loginUser = async (email: string, password: string): Promise<string> => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
+    const user = userCredential.user;
+
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in .env file.');
+    }
+
+    const token = jwt.sign(
+      { uid: user.uid, email: user.email },
+      jwtSecret,
+      { expiresIn: '7d' }
+    );
+
+    return token;
+  } catch (error: any) {
+    console.error("Firebase Login Error:", error);
+
+    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+      throw new Error('Invalid email or password.');
+    }
+    
+    throw new Error('Login failed. Please try again.');
+  }
 };

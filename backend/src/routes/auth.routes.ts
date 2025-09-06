@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { initiateSignup, verifyAndCompleteSignup } from '../controllers/auth.controller';
+import { initiateSignup, login, verifyAndCompleteSignup } from '../controllers/auth.controller';
 
 const router = Router();
 
@@ -8,5 +8,8 @@ router.post('/signup/initiate', initiateSignup);
 
 // Route to verify the OTP and create the user
 router.post('/signup/verify', verifyAndCompleteSignup);
+
+// Route to login the user
+router.post('/login', login);
 
 export default router;
