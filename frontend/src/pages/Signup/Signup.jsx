@@ -10,8 +10,6 @@ import "./Signup.css";
  *
  * - Initiate signup: POST { name, email, password } -> API_URL_INIT
  * - Verify OTP: POST { email, otp } -> API_URL_VERIFY
- *
- * Adjust API URLs if your server uses different paths.
  */
 const API_URL_INIT = "http://192.168.137.3:3333/v1/auth/signup/initiate";
 const API_URL_VERIFY = "http://192.168.137.3:3333/v1/auth/signup/verify";
@@ -112,7 +110,6 @@ function Signup() {
         setServerError(res.data?.message || "Could not initiate signup. Try again.");
       }
     } catch (err) {
-      console.error("Signup initiate error:", err);
       if (err.response) {
         setServerError(err.response.data?.message || `Server error: ${err.response.status}`);
       } else if (err.request) {
@@ -157,7 +154,6 @@ function Signup() {
         setServerError(res.data?.message || "OTP verification failed. Try again.");
       }
     } catch (err) {
-      console.error("OTP verify error:", err);
       if (err.response) {
         setServerError(err.response.data?.message || `Server error: ${err.response.status}`);
       } else if (err.request) {
@@ -186,6 +182,7 @@ function Signup() {
         email: formData.email.trim(),
         password: formData.password,
       };
+
       const res = await axios.post(API_URL_INIT, payload, {
         headers: { "Content-Type": "application/json" },
         timeout: 15000,
@@ -198,7 +195,6 @@ function Signup() {
         setServerError(res.data?.message || "Failed to resend OTP. Try again later.");
       }
     } catch (err) {
-      console.error("Resend OTP error:", err);
       if (err.response) {
         setServerError(err.response.data?.message || `Server error: ${err.response.status}`);
       } else if (err.request) {
